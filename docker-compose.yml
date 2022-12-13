@@ -11,3 +11,11 @@ services:
       - GO111MODULE=on
     working_dir: /go/src/app
     tty: true
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - ${DOCKER_REDIS_PORT}:6379
+    command: --requirepass "${DOCKER_REDIS_PASSWORD}"
+    volumes:
+      - ./data/redis:/data

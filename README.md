@@ -11,6 +11,12 @@
 $ git https://github.com/yuyuancha/chatroom-service.git
 ```
 
+* 複製 .env.example 為 .env
+
+```
+$ cp .env.example .env
+```
+
 * 複製 env.yml.example 為 env.yml
 
 ```
