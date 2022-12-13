@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/yuyuancha/chatroom-service/config"
-	"github.com/yuyuancha/chatroom-service/redis"
+	"github.com/yuyuancha/chatroom-service/server"
 )
 
 func init() {
@@ -12,9 +12,7 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Hello world!")
-
-	redis.Pong()
+	server.SetServer()
 }
 
 func printAPPInfo() {

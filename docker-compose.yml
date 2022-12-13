@@ -3,6 +3,8 @@ version: "3.5"
 services:
   app:
     image: golang:1.17-stretch
+    ports:
+      - ${DOCKER_HTTP_PORT}:80
     volumes:
       - ./:/go/src/app
       - ./data/go/pkg/mod:/go/pkg/mod
