@@ -31,7 +31,7 @@ func (Message) Create(message model.Message) {
 }
 
 func (Message) Get() []model.Message {
-	data, err := redisClient.LRange(ctx, keyMessages, 0, -1).Result()
+	data, err := redisClient.LRange(ctx, keyMessages, -5, -1).Result()
 	if err != nil {
 		fmt.Println("取得訊息錯誤。err:", err.Error())
 

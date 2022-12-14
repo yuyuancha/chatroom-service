@@ -1,8 +1,7 @@
 package service
 
 import (
-	"encoding/json"
-	"fmt"
+	"time"
 
 	"github.com/yuyuancha/chatroom-service/model"
 	"github.com/yuyuancha/chatroom-service/redis"
@@ -10,15 +9,12 @@ import (
 
 var messageRedis redis.Message
 
-func MapMessageByWebsocket(data string) *model.Message {
+func MapMessageByWebsocket(name, content string) *model.Message {
 	var message model.Message
 
-	err := json.Unmarshal([]byte(data), &message)
-	if err != nil {
-		fmt.Println("websocket 資料轉換結構錯誤。err:", err.Error())
-
-		return nil
-	}
+	message.Author = name
+	message.Content = content
+	message.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 
 	return &message
 }

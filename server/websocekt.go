@@ -6,11 +6,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/yuyuancha/chatroom-service/model"
 	"github.com/yuyuancha/chatroom-service/redis"
 	"github.com/yuyuancha/chatroom-service/service"
 )
 
 var messageRedis redis.Message
+var messageChannel = make(chan model.Message)
 
 func handleWebsocket(c *gin.Context) {
 	upGrader := websocket.Upgrader{
@@ -19,6 +21,11 @@ func handleWebsocket(c *gin.Context) {
 		},
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+	}
+
+	name := c.Param("name")
+	if name == "" {
+		name = c.ClientIP()
 	}
 
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
@@ -35,22 +42,33 @@ func handleWebsocket(c *gin.Context) {
 	oldMessages := messageRedis.Get()
 	_ = ws.WriteJSON(oldMessages)
 
+	go ReadMessage(ws, name)
+	SendMessage(ws)
+}
+
+func ReadMessage(ws *websocket.Conn, name string) {
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
 			return
 		}
 
-		messagePointer := service.MapMessageByWebsocket(string(data))
+		messagePointer := service.MapMessageByWebsocket(name, string(data))
 		if messagePointer == nil {
 			continue
 		}
 
-		fmt.Println(*messagePointer)
-		_ = ws.WriteJSON(struct {
-			Reply string `json:"rep2ly"`
-		}{
-			Reply: "Echo...",
-		})
+		message := *messagePointer
+		messageRedis.Create(message)
+
+		messageChannel <- message
+		<-messageChannel
+	}
+}
+
+func SendMessage(ws *websocket.Conn) {
+	for message := range messageChannel {
+		_ = ws.WriteJSON(message)
+		messageChannel <- message
 	}
 }

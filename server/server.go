@@ -8,7 +8,7 @@ func SetServer() {
 	server.Use(gin.Recovery())
 	_ = server.SetTrustedProxies(nil)
 
-	server.GET("/messages", handleWebsocket)
+	server.GET("/messages/:name", handleWebsocket)
 
 	_ = server.Run(":80")
 }
